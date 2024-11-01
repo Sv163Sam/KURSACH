@@ -16,7 +16,6 @@ sudo nano /opt/homebrew/etc/nginx/sites-enabled/KURSACH.conf
 
 
 server 
-
 {
 
        listen 80; 
