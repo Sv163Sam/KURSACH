@@ -3,17 +3,23 @@
 https://github.com/Sv163Sam/KURSACH.git
 
 brew update
+
 brew apt install nginx
+
 brew services start nginx 
+
 brew services stop nginx
 
 sudo nano /opt/homebrew/etc/nginx/sites-enabled/KURSACH.conf
 
 /opt/homebrew/etc/nginx/sites-enabled/KURSACH.conf: 
 
-server {
+server 
+{
        listen 80; 
+       
        server_name localhost;
+       
        root /absolute_path_to_project; 
 
        # Доступ к файлам статики (HTML, CSS, JS)
