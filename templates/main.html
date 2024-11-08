@@ -10,35 +10,12 @@
     <header>
         <h1>Анализ видеофрагментов с помощью нейронных сетей</h1>
         <div class="auth-container">
-            <button class="auth-button">Вход / Регистрация</button>
-            <div class="auth-popup" style="display: none;">
-                <span class="close-button">✕</span>
-                <form class="auth-form" method="POST" action="/auth">
-                    <input type="radio" name="auth-type" id="login" value="login" checked>
-                    <label for="login">Вход</label>
-                    <input type="radio" name="auth-type" id="register" value="register" checked>
-                    <label for="register">Регистрация</label>
-
-                    <div class="input-group">
-                        <label for="username">Логин:</label>
-                        <input type="text" id="username" name="username">
-                        <span class="error-message" style="display: none;"></span>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="password">Пароль:</label>
-                        <input type="password" id="password" name="password">
-                        <span class="error-message" style="display: none;"></span>
-                    </div>
-
-                    <div class="input-group" id="register-fields" style="display: none;">
-                        <label for="email">Почта:</label>
-                        <input type="email" id="email" name="email">
-                        <span class="error-message" style="display: none;"></span>
-                    </div>
-
-                    <button type="submit" class="auth-submit">Войти / Зарегистрироваться</button>
-                </form>
+            <button class="user-button" id="user-button"> {{ username }} </button>
+            <div class="user-menu" style="display: none;">
+                <ul>
+                    <li><a href="/logout">Выход</a></li>
+                    <li><a href="#">Настройки</a></li>
+                </ul>
             </div>
         </div>
     </header>
@@ -67,7 +44,7 @@
                 <img class="result-image" src="" style="display: none;">
             </div>
             <div class="balance-container" style="display: none;">
-                <p class="balance-text">Баланс: </p>
+                <p class="balance-text">Баланс: {{ balance }}</p>
                 <p class="cost-text">Стоимость запроса: ...</p>
             </div>
             <div class="error-container" style="display: none;">
