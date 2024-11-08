@@ -37,16 +37,61 @@ h1 {
 }
 
 .auth-popup {
-    background-color: #282828;
     color: #fff;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    padding: 20px;
+    position: relative;
+    padding-top: 70px;
     border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80vw;
+    text-align: center;
+}
+
+.auth-form label,
+.auth-form input,
+.auth-form button
+{
+    line-height: 3;
+    margin-bottom: 2vh;
+    width: 80vw;
+}
+
+.auth-form input[type="radio"] {
     display: none;
-    z-index: 10;
+}
+
+.auth-form label {
+    display: inline-block;
+    background-color: #383838;
+    border: 1px solid #484848;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.auth-form input[type="radio"]:checked + label {
+    background-color: #484848;
+    color: #fff;
+}
+
+.auth-submit {
+    background-color: #383838;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.balance-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
 }
 
 .close-button {
@@ -55,12 +100,39 @@ h1 {
     right: 10px;
     cursor: pointer;
     font-size: 1.5em;
+    font-family: "Avenir Next";
+    background-blend-mode: darken;
+    color: gray;
 }
 
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.error-container {
+    background-color: red;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.error-message {
+    font-weight: bold;
+    color: red;
+    background-color: red;
+    width: 100vw;
+}
+
+.exit-button{
+    background: none;
+    border: none;
+    color: black;
+    font-size: 1em;
+}
+
+footer {
+    background-color: #282828;
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    position: relative;
+    bottom: 0;
 }
 
 .input-group {
@@ -69,13 +141,14 @@ h1 {
     gap: 5px;
 }
 
-.auth-submit {
-    background-color: #383838;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+.input-group input:invalid {
+    border-color: #ff0000;
+}
+
+.input-group input:invalid + .error-message {
+    display: block;
+    color: red;
+    background-color: red;
 }
 
 .networks {
@@ -92,32 +165,6 @@ h1 {
     border-radius: 5px;
     width: 300px;
     text-align: center;
-}
-
-.upload {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-}
-
-.video-upload {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #282828;
-    cursor: pointer;
-}
-
-.upload-button {
-    font-size: 3em;
-    color: #fff;
-    background: none;
-    border: none;
 }
 
 .network-selection {
@@ -144,75 +191,25 @@ h1 {
     text-align: center;
 }
 
-.balance-container {
+.upload {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    text-align: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
 }
 
-.error-container {
-    background-color: #481818;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-}
-
-.error-message {
+.upload-button {
+    font-size: 3em;
     color: #fff;
-    font-weight: bold;
+    background: none;
+    border: none;
 }
 
-footer {
-    background-color: #282828;
-    width: 100%;
-    padding: 10px 0;
-    text-align: center;
-    position: fixed;
-    bottom: 0;
+.user-data {
+    display: inline-flex;
 }
 
-/* Стиль для переключателя */
-.auth-form input[type="radio"] {
-    display: none;
-}
-
-.auth-form label {
-    display: inline-block;
-    padding: 5px 10px;
-    background-color: #383838;
-    border: 1px solid #484848;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 5px;
-}
-
-.auth-form input[type="radio"]:checked + label {
-    background-color: #484848;
-    color: #fff;
-}
-
-/* Стиль для скрытых полей */
-#register-fields {
-    display: none;
-}
-
-/* Стиль для полей с ошибкой */
-.error-message {
-    color: #ff0000;
-    font-weight: bold;
-    display: none;
-}
-
-.input-group input:invalid {
-    border-color: #ff0000;
-}
-
-.input-group input:invalid + .error-message {
-    display: block;
-}
-
-/* Стиль для пользователя при авторизации */
 .user-profile {
     position: relative;
     display: inline-block;
@@ -250,3 +247,17 @@ footer {
 .user-profile li:hover {
     background-color: #383838;
 }
+
+.video-upload {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #282828;
+    cursor: pointer;
+}
+
+
+

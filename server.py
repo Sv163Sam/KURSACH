@@ -2,8 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 import os
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
-app.secret_key = 'Key'  # Замените на секретный ключ
+app = Flask(__name__) # Замените на секретный ключ
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'mp4'}
@@ -21,10 +20,7 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    if 'username' in session:
-        return render_template('index.html', username=session['username'], balance=session['balance'])
-    else:
-        return render_template('index.html')
+        return render_template('guest.html')
 # Отображаем auth.html
 
 
@@ -41,6 +37,7 @@ def auth():
         if user:
             session['username'] = username
             session['balance'] = user['balance']  # Добавьте логику получения баланса
+            redirect(url_for('auth.html'))
             return jsonify({'success': True, 'message': 'Успешный вход', 'balance': user['balance']})
         else:
             return jsonify({'success': False, 'message': 'Неверный логин или пароль'})
@@ -130,7 +127,7 @@ def get_db():
 # Главная страница
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('guest.html')
 
 
 # Обработка авторизации

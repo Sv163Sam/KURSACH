@@ -10,13 +10,7 @@
     <header>
         <h1>Анализ видеофрагментов с помощью нейронных сетей</h1>
         <div class="auth-container">
-            <button class="user-button" id="user-button"> {{ username }} </button>
-            <div class="user-menu" style="display: none;">
-                <ul>
-                    <li><a href="/logout">Выход</a></li>
-                    <li><a href="#">Настройки</a></li>
-                </ul>
-            </div>
+            <button class="auth-button">Вход / Регистрация</button>
         </div>
     </header>
 
@@ -43,12 +37,8 @@
                 <p class="result-text"></p>
                 <img class="result-image" src="" style="display: none;">
             </div>
-            <div class="balance-container" style="display: none;">
-                <p class="balance-text">Баланс: {{ balance }}</p>
-                <p class="cost-text">Стоимость запроса: ...</p>
-            </div>
-            <div class="error-container" style="display: none;">
-                <p class="error-message"></p>
+            <div class="balance-container">
+                <p class="cost-text">Количество бесплатных запросов: </p>
             </div>
         </section>
     </main>
@@ -57,6 +47,5 @@
         <p>© 2024 Самарский университет by Vladimirscrew, Yagermeister</p>
     </footer>
 
-    <script src="/static/index.js"></script>
 </body>
 </html>
