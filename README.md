@@ -1,5 +1,7 @@
 # KURSACH
 
+Python 3.11
+
 https://github.com/Sv163Sam/KURSACH.git
 
 brew update
