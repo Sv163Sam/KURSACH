@@ -30,17 +30,30 @@
         </section>
 
         <section class="upload">
-            <h2>Загрузите видео</h2>
-            <div class="video-upload">
-                <button class="upload-button">+</button>
-                <input type="file" id="video-file" accept="video/*" style="display: none;">
+            <h2>Загрузите файл</h2>
+            <div class="video">
+                <form method="POST" action="/upload_a" enctype="multipart/form-data" id="upload-form">
+                    <button type="button" onclick="document.getElementById('video-file').click()" class="upload-button">+</button>
+                    <input type="file" name="file" id="video-file" style="display: none;" onchange="submitForm();">
+                </form>
             </div>
-            <div class="result-container" style="display: none;">
-                <p class="result-text"></p>
-                <img class="result-image" src="" style="display: none;">
+
+            <script>
+                function submitForm()
+                {
+                    let fileInput = document.getElementById('video-file');
+                    if (fileInput.files.length > 0)
+                        document.getElementById('upload-form').submit();
+                }
+            </script>
+            <div class="result-container" id='rc'>
+                <p class="result-text">weffweefwfewwfeewfefwmefwkewfmpefwmfewpmfewpmefwwfefewweffwefwefewwfefwefwe</p>
+                {% if result_image_exists %}
+                <img class="result-image" src="{{ url_for('static', filename='imgs/result.png') }}" style="width: 35vh; height: 35vh;">
+                {% endif %}
             </div>
             <div class="balance-container">
-                <p class="cost-text">Стоимость запроса: </p>
+                <p class="cost-text">Количество бесплатных запросов: </p>
             </div>
         </section>
     </main>

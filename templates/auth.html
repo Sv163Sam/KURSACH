@@ -13,26 +13,29 @@
 
     <main>
         <div class="auth-popup">
-            <span class="close-button">Вернуться</span>
+            <span class="close-button" onclick="location.href='/auth'">✕</span>
             <form class="auth-form" method="POST" action="">
-                <input type="radio" name="auth-type" id="login" value="login" checked>
+                <input type="radio" name="auth-type" id="login" value="login" checked onclick="toggleRegisterFields(false)">
                 <label for="login">Вход</label>
-                <input type="radio" name="auth-type" id="register" value="register" checked>
+                <input type="radio" name="auth-type" id="register" value="register" onclick="toggleRegisterFields(true)">
                 <label for="register">Регистрация</label>
 
                 <div class="input-group">
                     <label for="username">Логин:</label>
                     <input type="text" id="username" name="username">
+                    <span class="error-message" style="display: none;"></span>
                 </div>
 
                 <div class="input-group">
                     <label for="password">Пароль:</label>
                     <input type="password" id="password" name="password">
+                    <span class="error-message" style="display: none;"></span>
                 </div>
 
-                <div class="input-group" id="register-fields" style="display: block;">
+                <div class="input-group" id="register-fields" style="{% if show_register_fields %}display: block{% else %}display: none{% endif %}">
                     <label for="email">Почта:</label>
                     <input type="email" id="email" name="email">
+                    <span class="error-message" style="display: none;"></span>
                 </div>
 
                 <button type="submit" class="auth-submit">Войти / Зарегистрироваться</button>
@@ -44,5 +47,16 @@
         <p>© 2024 Самарский университет by Vladimirscrew, Yagermeister</p>
     </footer>
 
+    <script>
+        function toggleRegisterFields(show) {
+            let registerFields = document.getElementById('register-fields');
+            if (show) {
+                registerFields.style.display = 'block';
+            } else {
+                registerFields.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
+
