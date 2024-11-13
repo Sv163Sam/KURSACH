@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Анализ видеофрагментов с помощью нейронных сетей</title>
     <link rel="stylesheet" href="/static/index.css">
+    <link>
 </head>
 <body>
     <header>
@@ -13,11 +14,11 @@
 
     <main>
         <div class="auth-popup">
-            <span class="close-button" onclick="location.href='/auth'">✕</span>
+            <span class="close-button" onclick="location.href='/'">✕</span>
             <form class="auth-form" method="POST" action="">
                 <input type="radio" name="auth-type" id="login" value="login" checked onclick="toggleRegisterFields(false)">
                 <label for="login">Вход</label>
-                <input type="radio" name="auth-type" id="register" value="register" onclick="toggleRegisterFields(true)">
+                <input type="radio" name="auth-type" id="register" value="register" checked onclick="toggleRegisterFields(true)">
                 <label for="register">Регистрация</label>
 
                 <div class="input-group">
@@ -33,7 +34,7 @@
                 </div>
 
                 <div class="input-group" id="register-fields" style="{% if show_register_fields %}display: block{% else %}display: none{% endif %}">
-                    <label for="email">Почта:</label>
+                    <label for="email" id="label_email">Почта:</label>
                     <input type="email" id="email" name="email">
                     <span class="error-message" style="display: none;"></span>
                 </div>

@@ -10,9 +10,9 @@
     <header>
         <h1>Анализ видеофрагментов с помощью нейронных сетей</h1>
         <div class="user-data">
-            <p>username:&nbsp;</p>
-            <p>balance&nbsp;<br></p>
-            <button class="exit-button"><b>Выйти</b></button>
+            <p>username:&nbsp;{{ username }}&nbsp;</p>
+            <p>balance:&nbsp;{{ balance }}&nbsp;</p>
+            <button class="exit-button" onclick="location.href='/'"><b>Выйти</b></button>
         </div>
     </header>
 
@@ -21,18 +21,20 @@
             <h2>Наши нейронные сети</h2>
             <div class="network-card">
                 <h3>Классификация действий</h3>
-                <p>Описание нейронной сети...</p>
+                <p>Данная нейронная сеть анализирует любые видеофрагменты, на которых человек выполняет действия - классифицирует их.
+                Рекомендуется загружать видео фрагменты длиною 10-15 секунд в любом существующем формате. Ответ будет представлен в текстовым формате</p>
             </div>
             <div class="network-card">
                 <h3>Оригинальность видео</h3>
-                <p>Описание нейронной сети...</p>
+                <p>Данная нейронная сеть анализирует любые фотофрагменты - определяет их оригинальность на предмет участия нейронных сетей в их создании.
+                Рекомендуется загружать любые фотофрагменты во всех возможных существующих форматах. Ответ будет представлен в текстовом формате.</p>
             </div>
         </section>
 
         <section class="upload">
             <h2>Загрузите файл</h2>
             <div class="video">
-                <form method="POST" action="/upload_a" enctype="multipart/form-data" id="upload-form">
+                <form method="POST" action="/upload_a/{{ username }}" enctype="multipart/form-data" id="upload-form">
                     <button type="button" onclick="document.getElementById('video-file').click()" class="upload-button">+</button>
                     <input type="file" name="file" id="video-file" style="display: none;" onchange="submitForm();">
                 </form>
@@ -47,13 +49,15 @@
                 }
             </script>
             <div class="result-container" id='rc'>
-                <p class="result-text">weffweefwfewwfeewfefwmefwkewfmpefwmfewpmfewpmefwwfefewweffwefwefewwfefwefwe</p>
+                {% if result_text_exists %}
+                <p class="result-text">{{ result_text_exists }}</p>
+                {% endif %}
                 {% if result_image_exists %}
-                <img class="result-image" src="{{ url_for('static', filename='imgs/result.png') }}" style="width: 35vh; height: 35vh;">
+                <p class="result-text">{{ result_image_exists }}</p>
                 {% endif %}
             </div>
             <div class="balance-container">
-                <p class="cost-text">Количество бесплатных запросов: </p>
+                <p class="cost-text">Стоимость запроса: 0.1$<br>Количество запросов: {{ free_count }}</p>
             </div>
         </section>
     </main>

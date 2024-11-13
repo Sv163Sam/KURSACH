@@ -24,7 +24,6 @@ h1 {
 .auth-container {
     position: relative;
     display: inline-block;
-    margin-left: 20px;
 }
 
 .auth-button {
@@ -134,6 +133,10 @@ footer {
     bottom: -40px;
 }
 
+main {
+    max-width: 40vw;
+}
+
 .input-group {
     display: flex;
     flex-direction: column;
@@ -186,8 +189,8 @@ footer {
 .result-container {
     background-color: #383838;
     padding: 20px;
-    width: 40vw;
-    height: 40vh;
+    width: 20vw;
+    height: 20vh;
     border-radius: 5px;
     text-align: center;
     overflow-y: auto;
@@ -195,6 +198,7 @@ footer {
 
 .result-text {
     word-wrap: break-word;
+    padding-top: 15%;
 }
 
 .upload {
