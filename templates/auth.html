@@ -15,11 +15,11 @@
     <main>
         <div class="auth-popup">
             <span class="close-button" onclick="location.href='/'">✕</span>
-            <form class="auth-form" method="POST" action="">
+            <form class="auth-form" method="POST">
                 <div id="selectors">
                     <input type="radio" name="auth-type" id="login" value="login" checked onclick="toggleRegisterFields(false)">
                     <label for="login">Вход</label>
-                    <input type="radio" name="auth-type" id="register" value="register" checked onclick="toggleRegisterFields(true)">
+                    <input type="radio" name="auth-type" id="register" value="register" onclick="toggleRegisterFields(true)">
                     <label for="register">Регистрация</label>
                 </div>
 

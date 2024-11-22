@@ -125,4 +125,4 @@ def check_register(username: str, password: str, email: str) -> bool:
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(ssl_context=('/Users/vladimirskobcov/Desktop/Labs/KURSACH/certficate/server.crt', '/Users/vladimirskobcov/Desktop/Labs/KURSACH/certficate/server.key'), host='0.0.0.0', port=443)
