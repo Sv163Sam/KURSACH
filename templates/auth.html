@@ -16,10 +16,12 @@
         <div class="auth-popup">
             <span class="close-button" onclick="location.href='/'">✕</span>
             <form class="auth-form" method="POST" action="">
-                <input type="radio" name="auth-type" id="login" value="login" checked onclick="toggleRegisterFields(false)">
-                <label for="login">Вход</label>
-                <input type="radio" name="auth-type" id="register" value="register" checked onclick="toggleRegisterFields(true)">
-                <label for="register">Регистрация</label>
+                <div id="selectors">
+                    <input type="radio" name="auth-type" id="login" value="login" checked onclick="toggleRegisterFields(false)">
+                    <label for="login">Вход</label>
+                    <input type="radio" name="auth-type" id="register" value="register" checked onclick="toggleRegisterFields(true)">
+                    <label for="register">Регистрация</label>
+                </div>
 
                 <div class="input-group">
                     <label for="username">Логин:</label>
@@ -33,7 +35,7 @@
                     <span class="error-message" style="display: none;"></span>
                 </div>
 
-                <div class="input-group" id="register-fields" style="{% if show_register_fields %}display: block{% else %}display: none{% endif %}">
+                <div class="input-group" id="register-fields" style="{% if show_register_fields %}display: flex{% else %}display: none{% endif %}">
                     <label for="email" id="label_email">Почта:</label>
                     <input type="email" id="email" name="email">
                     <span class="error-message" style="display: none;"></span>
@@ -52,7 +54,7 @@
         function toggleRegisterFields(show) {
             let registerFields = document.getElementById('register-fields');
             if (show) {
-                registerFields.style.display = 'block';
+                registerFields.style.display = 'flex';
             } else {
                 registerFields.style.display = 'none';
             }

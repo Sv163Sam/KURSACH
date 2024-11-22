@@ -16,7 +16,7 @@
 
     <main>
         <section class="networks">
-            <h2>Наши нейронные сети</h2>
+            <h2 id="networks-header">Наши нейронные сети</h2>
             <div class="network-card">
                 <h3>Классификация действий</h3>
                 <p>Данная нейронная сеть анализирует любые видеофрагменты, на которых человек выполняет действия - классифицирует их.
@@ -26,36 +26,6 @@
                 <h3>Оригинальность видео</h3>
                 <p>Данная нейронная сеть анализирует любые фотофрагменты - определяет их оригинальность на предмет участия нейронных сетей в их создании.
                 Рекомендуется загружать любые фотофрагменты во всех возможных существующих форматах. Ответ будет представлен в текстовом формате.</p>
-            </div>
-        </section>
-
-        <section class="upload">
-            <h2>Загрузите файл</h2>
-            <div class="video">
-                <form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
-                    <button type="button" onclick="document.getElementById('video-file').click()" class="upload-button">+</button>
-                    <input type="file" name="file" id="video-file" style="display: none;" onchange="submitForm();">
-                </form>
-            </div>
-
-            <script>
-                function submitForm()
-                {
-                    let fileInput = document.getElementById('video-file');
-                    if (fileInput.files.length > 0)
-                        document.getElementById('upload-form').submit();
-                }
-            </script>
-            <div class="result-container" id='rc'>
-                {% if result_text_exists %}
-                <p class="result-text">{{ result_text_exists }}</p>
-                {% endif %}
-                {% if result_image_exists %}
-                <p class="result-text">{{ result_image_exists }}</p>
-                {% endif %}
-            </div>
-            <div class="balance-container">
-                <p class="cost-text">Количество бесплатных запросов: {{ free_count }}</p>
             </div>
         </section>
     </main>

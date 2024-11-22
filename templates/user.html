@@ -10,15 +10,17 @@
     <header>
         <h1>Анализ видеофрагментов с помощью нейронных сетей</h1>
         <div class="user-data">
-            <p>username:&nbsp;{{ username }}&nbsp;</p>
-            <p>balance:&nbsp;{{ balance }}&nbsp;</p>
+            <p>Username:&nbsp;{{ username }}&nbsp;</p>
+            <p>Balance:&nbsp;{{ balance }}&nbsp;</p>
+        </div>
+        <div>
             <button class="exit-button" onclick="location.href='/'"><b>Выйти</b></button>
         </div>
     </header>
 
     <main>
         <section class="networks">
-            <h2>Наши нейронные сети</h2>
+            <h2 id="networks-header">Наши нейронные сети</h2>
             <div class="network-card">
                 <h3>Классификация действий</h3>
                 <p>Данная нейронная сеть анализирует любые видеофрагменты, на которых человек выполняет действия - классифицирует их.

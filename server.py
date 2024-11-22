@@ -1,9 +1,6 @@
 import subprocess
 import os
-# import ""
-# import ""
 from flask import Flask, render_template, request
-
 
 app = Flask(__name__)  # Замените на секретный ключ
 
@@ -13,8 +10,6 @@ app.config['TEMPLATES_FOLDER'] = 'templates'
 app.config['STATIC_FOLDER'] = 'static'  # Настройка папки статических файлов
 app.config['STATIC_URL_PATH'] = '/static'  # Настройка пути для доступа к статическим файлам
 os.makedirs('static/uploads', exist_ok=True)
-count = 5
-
 
 
 def is_video_file(filename):
@@ -29,60 +24,7 @@ def is_image_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('guest.html', free_count=count)
-
-
-@app.route('/upload', methods=['GET', 'POST'])
-def process_video():
-    global count
-    video_ai = True
-    free_count = count
-    if request.method == 'POST':
-        if free_count > 0:
-            count -= 1
-            free_count = count
-            if 'file' not in request.files:
-                print('Нет файла для загрузки.')
-
-            file = request.files['file']
-            if file.filename == '':
-                print('файл не выбран')
-
-            file.save(f'static/uploads/{file.filename}')
-
-            if is_video_file(f'static/uploads/{file.filename}'):
-                # func(f'static/uploads/{file.filename}')
-                subprocess.run(['python3', 'static/scripts/moi.py', f'static/uploads/{file.filename}']) #
-            else:
-                if is_image_file(f'static/uploads/{file.filename}'):
-                    print('true')
-                    video_ai = False
-                    # func(f'static/uploads/{file.filename}')
-                    subprocess.run(['python3', 'static/scripts/tvoi.py', f'static/uploads/{file.filename}'])
-                else:
-                    raise Exception("BAD ALL")
-
-    if free_count > 0:
-        if video_ai:
-            result_text = os.path.exists(os.path.join(app.root_path, 'static', 'results', 'result.txt'))
-            if result_text:
-                with open('static/results/result.txt', 'r', encoding='utf-8') as file:
-                    content = file.read()
-                return render_template('guest.html', result_text_exists=content, result_image_exists='', free_count=free_count)
-            else:
-                return render_template('guest.html', result_text_exists='', result_image_exists='', free_count=free_count)
-        elif not video_ai:
-            result_image = os.path.exists(os.path.join(app.root_path, 'static', 'results', 'result.txt'))
-            if result_image:
-                with open('static/results/result.txt', 'r', encoding='utf-8') as file:
-                    content = file.read()
-                return render_template('guest.html', result_text_exists='', result_image_exists=content, free_count=free_count)
-            else:
-                return render_template('guest.html', result_text_exists='', result_image_exists='', free_count=free_count)
-        else:
-            return render_template('guest.html', result_text_exists='', result_image_exists='', free_count=free_count)
-    else:
-        return render_template('guest.html', result_text_exists='', result_image_exists='', free_count=free_count)
+    return render_template('guest.html')
 
 
 @app.route('/upload_a/<username>', methods=['GET', 'POST'])
