@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import shutil
 from time import sleep
-
+import hashlib
 from flask import Flask, render_template, request
 import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker
@@ -150,7 +150,7 @@ def render_user(username: str, result_text_exists: str, result_image_exists: str
 def check_login(username: str, password: str) -> bool:
     if select_users(username):
         _, name, passwd, email, _ = select_users(username)[0]
-        if passwd == password:
+        if passwd == str(hashlib.md5(password.encode()).hexdigest()):
             return True
         else:
             return False

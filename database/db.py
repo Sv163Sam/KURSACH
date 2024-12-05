@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime
 
 import sqlalchemy as db
@@ -53,7 +54,7 @@ session = Session()
 
 #### Вставка пользователя
 def insert_user(login: str, password: str, email: str):
-    insert_user = insert(Users).values(login=login, password=password, email=email)
+    insert_user = insert(Users).values(login=login, password=str(hashlib.md5(password.encode()).hexdigest()), email=email)
     with engine.connect() as connection:
         connection.execute(insert_user)
         connection.commit()
