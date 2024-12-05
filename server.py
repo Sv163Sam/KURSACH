@@ -37,6 +37,7 @@ def delete_file(file_path):
     except Exception as e:
         print(f'Ошибка при удалении файла {file_path}: {e}')
 
+
 def is_video_file(filename):
     video_extensions = ['.mp4', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.webm']
     return any(filename.lower().endswith(ext) for ext in video_extensions)
@@ -129,7 +130,7 @@ def show_redirect_page():
                 if check_register(username, password, email):
                     return render_user(username, '', '')
                 else:
-                    return render_template('auth.html', show_register_fields=show_register_fields)
+                    return render_template('auth.html', show_register_fields=show_register_fields, flag=True)
             else:
                 if check_login(username, password):
                     return render_user(username, '', '')
@@ -140,7 +141,7 @@ def show_redirect_page():
 
 
 @app.route("/user", methods=['GET', 'POST'])
-def render_user(username: str, result_text_exists: str, result_image_exists: str):
+def render_user(username: str, result_text_exists: str, result_image_exists: str, flag_exists: bool = False):
     balance = select_users(username)[0][4]
     free_count = balance
     return render_template('user.html', username=username, balance=balance, result_text_exists=result_text_exists,
