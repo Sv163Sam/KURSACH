@@ -6,7 +6,7 @@ from sqlalchemy import insert, delete, select
 from sqlalchemy.orm import sessionmaker
 
 # Создание соединения и метаданных
-engine = db.create_engine('sqlite:///myDatabase.db')
+engine = db.create_engine('sqlite:///database/myDatabase.db')
 metadata = db.MetaData()
 
 BASE_STRING_SIZE = 255

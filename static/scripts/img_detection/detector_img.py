@@ -1,8 +1,10 @@
 import numpy as np
 import cv2 as cv
 import pickle
+import os
 
-def preprocessing(file_name : str):
+
+def preprocessing(file_name: str):
     if file_name.endswith('.jpg') or file_name.endswith('.jpeg') or file_name.endswith('.png'):
         # Читаем содержимое файла
         imgray = cv.imread(file_name, cv.IMREAD_GRAYSCALE)
@@ -22,9 +24,22 @@ def preprocessing(file_name : str):
         radialprofile = radialprofile[~nan_mask]
         return radialprofile
 
-def predict(file : str):
-    with open('C:\\Users\\Азиатка\\ТПЗРП\\web_site\\static\\scripts\\img_detection\\model.pkl', 'rb') as file_model:
+
+def delete_file(file_path):
+    try:
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print(f'Файл {file_path} успешно удален.')
+        else:
+            print(f'Файл {file_path} не найден.')
+    except Exception as e:
+        print(f'Ошибка при удалении файла {file_path}: {e}')
+
+
+def predict(file: str):
+    with open('static/scripts/img_detection/model.pkl', 'rb') as file_model:
         loaded_model = pickle.load(file_model)
     X_test = preprocessing(file)
     y_pred = loaded_model.predict(X_test)
+    delete_file(file)
     return y_pred

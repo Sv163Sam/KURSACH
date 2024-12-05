@@ -13,8 +13,8 @@ S = 2
 
 def detect_pose():
     frames = 0
-    source_filename = "../Source/91.mp4"
-    destination_filename = "../Poses/90.txt"
+    source_filename = "static/scripts/pose_detection/Source/91.mp4"
+    destination_filename = "static/scripts/pose_detection/Poses/90.txt"
 
     mp_drawing = mp.solutions.drawing_utils
     mp_pose = mp.solutions.pose
@@ -56,7 +56,8 @@ def processing():
     result = []
 
     labels = np.zeros(1472, dtype=int)  # Вектор меток для обучения
-
+    class_names = ["Бег(боковая проекция)", "Присяд", "Выпады", "Наклон туловища", "Ходьба(фронтальная проекция)",
+                   "Ходьба(боковая проекция)", "Вертикальный прыжок"]  # Названия меток для вывода
     # Индексы меток
     Run_side = 0  # Бег(боковая проекция)
     Sitdown = 1  # Присяд
@@ -68,7 +69,7 @@ def processing():
 
     def read_files():
         for file_index in range(0, N):
-            filename = f'../Poses/{file_index + 1}.txt'
+            filename = f'static/scripts/pose_detection/Poses/{file_index + 1}.txt'
             with open(filename, 'r') as file:
                 data = file.readlines()
             for line in data:
@@ -126,14 +127,14 @@ def processing():
 
         y_pred = model.predict(x_test)
 
-        return y_pred
+        return class_names[y_pred[0]]
 
     read_files()
     create_res()
     init_labels()
     pred = not_mixed_samples_train()
 
-    return pred[0]
+    return pred
 
 
 def delete_file(file_path):
@@ -151,7 +152,7 @@ def neuro_processing():
     detect_pose()
     pred = processing()
 
-    delete_file('../Source/91.mp4')
-    delete_file('../Poses/90.txt')
+    delete_file('static/scripts/pose_detection/Source/91.mp4')
+    delete_file('static/scripts/pose_detection/Poses/90.txt')
 
     return pred
