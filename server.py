@@ -1,6 +1,7 @@
-import subprocess
 import os
 from pathlib import Path
+import shutil
+from time import sleep
 
 from flask import Flask, render_template, request
 import sqlalchemy as db
@@ -23,6 +24,18 @@ metadata = db.MetaData()
 Session = sessionmaker(bind=engine)
 session = Session()
 
+ui_request = []
+
+
+def delete_file(file_path):
+    try:
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print(f'Файл {file_path} успешно удален.')
+        else:
+            print(f'Файл {file_path} не найден.')
+    except Exception as e:
+        print(f'Ошибка при удалении файла {file_path}: {e}')
 
 def is_video_file(filename):
     video_extensions = ['.mp4', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.webm']
@@ -41,42 +54,61 @@ def index():
 
 @app.route('/upload_a/<username>', methods=['GET', 'POST'])
 def process_video_a(username: str):
-    video_ai = True
+    global ui_request
 
     id, _, _, _, balance = select_users(username)[0]
     free_count = balance
 
     if request.method == 'POST':
         if free_count > 0:
-            free_count -= 1
-            insert_action(id, 1, 2)
+            while True:
+                free_count -= 1
+                insert_action(id, 1, 2)
 
-            if 'file' not in request.files:
-                print('Нет файла для загрузки.')
+                if 'file' not in request.files:
+                    print('Нет файла для загрузки.')
 
-            file = request.files['file']
-            if file.filename == '':
-                print('файл не выбран')
+                file = request.files['file']
+                if file.filename == '':
+                    print('файл не выбран')
 
-            file.save(f'static/uploads/{file.filename}')
+                ui_request.append([username, file.filename])
 
-            if is_video_file(f'static/uploads/{file.filename}'):
-                file.save(f'static/scripts/pose_detection/Source/{file.filename}')
-                os.rename('static/scripts/pose_detection/Source/' + file.filename,
-                          "static/scripts/pose_detection/Source/91" +
-                          Path(f'static/scripts/pose_detection/Source/{file.filename}').suffix)
-                content = nv.neuro_processing()
-                print(content)
-                return render_user(username, content, '')
-            else:
-                if is_image_file(f'static/uploads/{file.filename}'):
-                    content = predict('static/uploads/' + file.filename)
-                    if content:
-                        return render_user(username, '', "True")
-                    else:
-                        return render_user(username, '', "False")
+                file.save(f'static/uploads/{file.filename}')
+
+                while ui_request and username != ui_request[0][0]:
+                    sleep(0.01)
+
+                if is_video_file(f'static/uploads/{ui_request[0][1]}'):
+                    shutil.copy(f'static/uploads/{ui_request[0][1]}',
+                                f'static/scripts/pose_detection/Source/{ui_request[0][1]}')
+                    os.rename('static/scripts/pose_detection/Source/' + ui_request[0][1],
+                              "static/scripts/pose_detection/Source/91" +
+                              Path(f'static/scripts/pose_detection/Source/{ui_request[0][1]}').suffix)
+                    content = nv.neuro_processing()
+                    ui_request.pop(0)
+                    if os.path.exists('static/uploads/' + file.filename):
+                        delete_file('static/uploads/' + file.filename)
+                        if os.path.exists('static/scripts/pose_detection/Source/91.mp4'):
+                            delete_file('static/scripts/pose_detection/Source/91.mp4')
+                            if os.path.exists('static/scripts/pose_detection/Poses/90.txt'):
+                                delete_file('static/scripts/pose_detection/Poses/90.txt')
+                    return render_user(username, content, '')
                 else:
-                    raise Exception("BAD ALL")
+                    if is_image_file(f'static/uploads/{ui_request[0][1]}'):
+                        content = predict('static/uploads/' + ui_request[0][1])
+                        if content:
+                            ui_request.pop(0)
+                            if os.path.exists('static/uploads/' + file.filename):
+                                delete_file('static/uploads/' + file.filename)
+                            return render_user(username, '', "Фото сгенерированной нейронной сетью")
+                        else:
+                            ui_request.pop(0)
+                            if os.path.exists('static/uploads/' + file.filename):
+                                delete_file('static/uploads/' + file.filename)
+                            return render_user(username, '', "Фото оригинальное")
+                    else:
+                        raise Exception("BAD ALL")
         else:
             return render_user(username, '', '')
     else:
@@ -100,7 +132,6 @@ def show_redirect_page():
                     return render_template('auth.html', show_register_fields=show_register_fields)
             else:
                 if check_login(username, password):
-                    print("zaebok")
                     return render_user(username, '', '')
                 else:
                     return render_template('auth.html', show_register_fields=show_register_fields)

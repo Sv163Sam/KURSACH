@@ -40,6 +40,6 @@ def predict(file: str):
     with open('static/scripts/img_detection/model.pkl', 'rb') as file_model:
         loaded_model = pickle.load(file_model)
     X_test = preprocessing(file)
-    y_pred = loaded_model.predict(X_test)
+    y_pred = loaded_model.predict(np.array(X_test).reshape((1, len(X_test))))
     delete_file(file)
     return y_pred
