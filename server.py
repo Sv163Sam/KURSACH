@@ -1,20 +1,29 @@
 import os
-from pathlib import Path
+import uuid
 import shutil
-from time import sleep
 import hashlib
-from flask import Flask, render_template, request
+from time import sleep
 import sqlalchemy as db
+from pathlib import Path
+from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker
-from database.db import insert_user, insert_action, select_users, select_actions
-from static.scripts.img_detection.detector_img import predict
+from flask_httpauth import HTTPBasicAuth
+from database.db import insert_user, select_users
+from flask import Flask, render_template, request, abort
 import static.scripts.pose_detection.Model.Processing as nv
+from static.scripts.img_detection.detector_img import predict
 
-app = Flask(__name__)  # Замените на секретный ключ
+load_dotenv()
+
+app = Flask(__name__)
+auth = HTTPBasicAuth()
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_key')
 
 app.config['DATABASE'] = 'users.db'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['TEMPLATES_FOLDER'] = 'templates'
+
 app.config['STATIC_FOLDER'] = 'static'  # Настройка папки статических файлов
 app.config['STATIC_URL_PATH'] = '/static'  # Настройка пути для доступа к статическим файлам
 os.makedirs('static/uploads', exist_ok=True)
@@ -55,63 +64,66 @@ def index():
 
 @app.route('/upload_a/<username>', methods=['GET', 'POST'])
 def process_video_a(username: str):
-    global ui_request
+    if not auth.current_user():
+        abort(403)
 
+    global ui_request
     id, _, _, _, balance = select_users(username)[0]
     free_count = balance
 
     if request.method == 'POST':
-        if free_count > 0:
-            while True:
-                free_count -= 1
-                insert_action(id, 1, 2)
+        if free_count <= 0:
+            return render_user(username, '', '')
 
-                if 'file' not in request.files:
-                    print('Нет файла для загрузки.')
+        if 'file' not in request.files:
+            return render_user(username, '', 'Нет файла для загрузки.')
 
-                file = request.files['file']
-                if file.filename == '':
-                    print('файл не выбран')
+        file = request.files['file']
+        if file.filename == '' or not is_video_file(file.filename):
+            return render_user(username, '', 'Недопустимый файл.')
 
-                ui_request.append([username, file.filename])
+        unique_filename = f"{uuid.uuid4()}{Path(file.filename).suffix}"
+        file.save(f'static/uploads/{unique_filename}')
 
-                file.save(f'static/uploads/{file.filename}')
+        try:
+            ui_request.append([username, unique_filename])
+            while ui_request and username != ui_request[0][0]:
+                sleep(0.01)
 
-                while ui_request and username != ui_request[0][0]:
-                    sleep(0.01)
-
-                if is_video_file(f'static/uploads/{ui_request[0][1]}'):
-                    shutil.copy(f'static/uploads/{ui_request[0][1]}',
-                                f'static/scripts/pose_detection/Source/{ui_request[0][1]}')
-                    os.rename('static/scripts/pose_detection/Source/' + ui_request[0][1],
-                              "static/scripts/pose_detection/Source/91" +
-                              Path(f'static/scripts/pose_detection/Source/{ui_request[0][1]}').suffix)
-                    content = nv.neuro_processing()
+            if is_video_file(f'static/uploads/{ui_request[0][1]}'):
+                shutil.copy(f'static/uploads/{ui_request[0][1]}',
+                            f'static/scripts/pose_detection/Source/{ui_request[0][1]}')
+                os.rename('static/scripts/pose_detection/Source/' + ui_request[0][1],
+                          "static/scripts/pose_detection/Source/91" +
+                          Path(f'static/scripts/pose_detection/Source/{ui_request[0][1]}').suffix)
+                content = nv.neuro_processing()
+                ui_request.pop(0)
+                if os.path.exists('static/uploads/' + file.filename):
+                    delete_file('static/uploads/' + file.filename)
+                    if os.path.exists('static/scripts/pose_detection/Source/91.mp4'):
+                        delete_file('static/scripts/pose_detection/Source/91.mp4')
+                        if os.path.exists('static/scripts/pose_detection/Poses/90.txt'):
+                            delete_file('static/scripts/pose_detection/Poses/90.txt')
+                return render_user(username, content, '')
+                pass
+            elif is_image_file(f'static/uploads/{ui_request[0][1]}'):
+                content = predict('static/uploads/' + ui_request[0][1])
+                if content:
                     ui_request.pop(0)
                     if os.path.exists('static/uploads/' + file.filename):
                         delete_file('static/uploads/' + file.filename)
-                        if os.path.exists('static/scripts/pose_detection/Source/91.mp4'):
-                            delete_file('static/scripts/pose_detection/Source/91.mp4')
-                            if os.path.exists('static/scripts/pose_detection/Poses/90.txt'):
-                                delete_file('static/scripts/pose_detection/Poses/90.txt')
-                    return render_user(username, content, '')
+                    return render_user(username, '', "Фото сгенерированной нейронной сетью")
                 else:
-                    if is_image_file(f'static/uploads/{ui_request[0][1]}'):
-                        content = predict('static/uploads/' + ui_request[0][1])
-                        if content:
-                            ui_request.pop(0)
-                            if os.path.exists('static/uploads/' + file.filename):
-                                delete_file('static/uploads/' + file.filename)
-                            return render_user(username, '', "Фото сгенерированной нейронной сетью")
-                        else:
-                            ui_request.pop(0)
-                            if os.path.exists('static/uploads/' + file.filename):
-                                delete_file('static/uploads/' + file.filename)
-                            return render_user(username, '', "Фото оригинальное")
-                    else:
-                        raise Exception("BAD ALL")
-        else:
-            return render_user(username, '', '')
+                    ui_request.pop(0)
+                    if os.path.exists('static/uploads/' + file.filename):
+                        delete_file('static/uploads/' + file.filename)
+                    return render_user(username, '', "Фото оригинальное")
+                pass
+            else:
+                return render_user(username, '', 'Недопустимый файл.')
+        finally:
+            if os.path.exists(f'static/uploads/{unique_filename}'):
+                delete_file(f'static/uploads/{unique_filename}')
     else:
         return render_user(username, '', '')
 
@@ -130,28 +142,34 @@ def show_redirect_page():
                 if check_register(username, password, email):
                     return render_user(username, '', '')
                 else:
-                    return render_template('auth.html', show_register_fields=show_register_fields, flag=True)
+                    return render_template('auth.html', show_register_fields=show_register_fields, show_alert=True)
             else:
                 if check_login(username, password):
                     return render_user(username, '', '')
                 else:
-                    return render_template('auth.html', show_register_fields=show_register_fields)
-
+                    return render_template('auth.html', show_alert=True)
+        else:
+            abort(403)
     return render_template('auth.html', show_register_fields=show_register_fields)
 
 
-@app.route("/user", methods=['GET', 'POST'])
-def render_user(username: str, result_text_exists: str, result_image_exists: str, flag_exists: bool = False):
+@app.route("/user", methods=['GET'])
+def render_user(username: str = '', result_text_exists: str = '', result_image_exists: str = '', flag_exists: bool = False):
+    if username == '' or username == '' and result_text_exists == '' or username == '' and result_text_exists == '' and result_image_exists == '':
+        abort(403)
+
     balance = select_users(username)[0][4]
     free_count = balance
-    return render_template('user.html', username=username, balance=balance, result_text_exists=result_text_exists,
-                           result_image_exists=result_image_exists, free_count=free_count)
+    return render_template('user.html', username=username, balance=balance,
+                           result_text_exists=result_text_exists,
+                           result_image_exists=result_image_exists,
+                           free_count=free_count)
 
 
 def check_login(username: str, password: str) -> bool:
     if select_users(username):
         _, name, passwd, email, _ = select_users(username)[0]
-        if passwd == str(hashlib.md5(password.encode()).hexdigest()):
+        if passwd == str(hashlib.sha256(password.encode()).hexdigest()):
             return True
         else:
             return False

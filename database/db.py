@@ -31,7 +31,7 @@ Transactions = db.Table('Transaction', metadata,
 Actions = db.Table('Action', metadata,
                    Column("id", Integer, primary_key=True),
                    Column("type_id", Integer, ForeignKey(Action_types.c.id)),
-                   Column("date",  DateTime(), default=datetime.now),
+                   Column("date", DateTime(), default=datetime.now),
                    Column("token_cost", Integer, nullable=True, default=None),
                    Column("transaction_id", Integer, ForeignKey(Transactions.c.id), nullable=True, default=None),
                    Column("user_id", Integer, ForeignKey(Users.c.id)))
@@ -54,14 +54,15 @@ session = Session()
 
 #### Вставка пользователя
 def insert_user(login: str, password: str, email: str):
-    insert_user = insert(Users).values(login=login, password=str(hashlib.md5(password.encode()).hexdigest()), email=email)
+    insert_user = insert(Users).values(login=login, password=str(hashlib.sha256(password.encode()).hexdigest()),
+                                       email=email)
     with engine.connect() as connection:
         connection.execute(insert_user)
         connection.commit()
 
 
 #### Вставка типа действия
-def insert_action_type(id : int, type : str):
+def insert_action_type(id: int, type: str):
     insert_action_type = insert(Action_types).values(id=id, type=type)
     with engine.connect() as connection:
         connection.execute(insert_action_type)
@@ -91,6 +92,7 @@ def select_users(name: str):
         result = connection.execute(select_user)
         connection.commit()
     return result.all()
+
 
 #### Выбор всех типов действий
 def select_action_types(id: int):
@@ -129,7 +131,7 @@ def delete_users(id: int):
 
 
 #### Удаление типа действия
-def delete_action_types(id : int):
+def delete_action_types(id: int):
     delete_action_type = delete(Action_types).where(Action_types.c.id == id)
     with engine.connect() as connection:
         connection.execute(delete_action_type)
@@ -145,6 +147,7 @@ def delete_transactions(id: int):
         connection.commit()
     return delete_transaction
 
+
 #### Удаление действия
 def delete_actions(id: int):
     delete_action = delete(Actions).where(Actions.c.id == id)
@@ -152,6 +155,7 @@ def delete_actions(id: int):
         connection.execute(delete_action)
         connection.commit()
     return delete_action
+
 
 """
 insert_action_type(1,"video")

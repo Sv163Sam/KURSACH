@@ -113,10 +113,16 @@ h1 {
 }
 
 .error-message {
-    font-weight: bold;
+    font-weight: normal;
     color: red;
     background-color: red;
     width: 100vw;
+}
+
+.error-alert {
+    font-weight: bold;
+    color: red;
+    text-align: center;
 }
 
 .exit-button{
@@ -155,6 +161,13 @@ main {
 
 .input-group input:invalid {
     border-color: #ff0000;
+}
+
+.error-message:focus
+{
+    display: block;
+    color: red;
+    background-color: red;
 }
 
 .input-group input:invalid + .error-message {

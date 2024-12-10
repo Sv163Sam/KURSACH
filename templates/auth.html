@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,10 +23,14 @@
                     <label for="register">Регистрация</label>
                 </div>
 
+                <div class="error-alert" style="{% if show_alert %}display: flex{% else %}display: none{% endif %}">
+                    Логин или пароль не верны
+                </div>
+
                 <div class="input-group">
                     <label for="username">Логин:</label>
                     <input type="text" id="username" name="username">
-                    <span class="error-message" style="display: none;"></span>
+                    <span class="error-message" id="login_span" style="display: none;"></span>
                 </div>
 
                 <div class="input-group">
