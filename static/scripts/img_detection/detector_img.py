@@ -3,6 +3,8 @@ import cv2 as cv
 import pickle
 import os
 
+from sklearn.preprocessing import StandardScaler
+
 
 def preprocessing(file_name: str):
     if file_name.endswith('.jpg') or file_name.endswith('.jpeg') or file_name.endswith('.png'):
@@ -10,7 +12,6 @@ def preprocessing(file_name: str):
         imgray = cv.imread(file_name, cv.IMREAD_GRAYSCALE)
         imgray = cv.resize(imgray, (512, 512))
         dft_img = np.fft.fft2(imgray).real
-        # print(dft_img.shape)
         if np.max(dft_img.real) != 0:
             imgray = dft_img / np.max(dft_img.real)
         center = np.array(imgray.shape) // 2
@@ -37,10 +38,17 @@ def delete_file(file_path):
 
 
 def predict(file: str):
+
     with open('static/scripts/img_detection/model.pkl', 'rb') as file_model:
         loaded_model = pickle.load(file_model)
-    X_test = preprocessing(file)
-    X_test = np.array(X_test).reshape((1, len(X_test)))
-    y_pred = loaded_model.predict(X_test)
-    delete_file(file)
-    return y_pred
+        scaler = StandardScaler()
+        X_train = np.load("static/scripts/img_detection/train.npy", allow_pickle=True)
+        X_train = scaler.fit_transform(X_train)
+        X_test = np.load("static/scripts/img_detection/test.npy", allow_pickle=True)
+        x_test = preprocessing(file)
+        x_test = np.array(x_test).reshape((1, len(x_test)))
+        X_test[X_test.shape[0] - 1] = x_test
+        X_test = scaler.transform(X_test)
+        y_pred = loaded_model.predict(X_test)
+        delete_file(file)
+        return y_pred[len(y_pred)-1:]

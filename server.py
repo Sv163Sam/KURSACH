@@ -7,7 +7,6 @@ import sqlalchemy as db
 from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker
-from flask_httpauth import HTTPBasicAuth
 from database.db import insert_user, select_users
 from flask import Flask, render_template, request, abort
 import static.scripts.pose_detection.Model.Processing as nv
@@ -16,7 +15,6 @@ from static.scripts.img_detection.detector_img import predict
 load_dotenv()
 
 app = Flask(__name__)
-auth = HTTPBasicAuth()
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_key')
 
@@ -57,14 +55,14 @@ def is_image_file(filename):
     return any(filename.lower().endswith(ext) for ext in image_extensions)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
     return render_template('guest.html')
 
 
-@app.route('/upload_a/<username>', methods=['GET', 'POST'])
-def process_video_a(username: str):
-    if not auth.current_user():
+@app.route('/upload_a/<username>', methods=['POST'])
+def process_video_a(username: str = ''):
+    if username == '':
         abort(403)
 
     global ui_request
@@ -79,7 +77,7 @@ def process_video_a(username: str):
             return render_user(username, '', 'Нет файла для загрузки.')
 
         file = request.files['file']
-        if file.filename == '' or not is_video_file(file.filename):
+        if file.filename == '' and is_video_file(file.filename) and is_image_file(file.filename):
             return render_user(username, '', 'Недопустимый файл.')
 
         unique_filename = f"{uuid.uuid4()}{Path(file.filename).suffix}"
