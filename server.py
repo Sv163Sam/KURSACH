@@ -1,17 +1,20 @@
+import datetime
 import os
 import uuid
 import shutil
 import hashlib
+from functools import wraps
 from time import sleep
+
+import jwt
 import sqlalchemy as db
 from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker
 from database.db import insert_user, select_users
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, jsonify
 import static.scripts.pose_detection.Model.Processing as nv
 from static.scripts.img_detection.detector_img import predict
-
 load_dotenv()
 
 app = Flask(__name__)
@@ -28,6 +31,7 @@ os.makedirs('static/uploads', exist_ok=True)
 
 engine = db.create_engine('sqlite:///myDatabase.db')
 metadata = db.MetaData()
+
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -60,10 +64,34 @@ def index():
     return render_template('guest.html')
 
 
-@app.route('/upload_a/<username>', methods=['POST'])
-def process_video_a(username: str = ''):
-    if username == '':
-        abort(403)
+def create_token(username):
+    token = jwt.encode({
+        'username': username,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Токен действителен 1 час
+    }, app.config['SECRET_KEY'], algorithm='HS256')
+    return token
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.form.get('token')
+        print(token)
+        if not token:
+            abort(403)
+
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        current_user = data['username']
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated_function
+
+
+@app.route('/upload_a', methods=['POST', 'GET'])
+@token_required
+def process_video_a(current_user):
+    username = current_user
 
     global ui_request
     id, _, _, _, balance = select_users(username)[0]
@@ -138,12 +166,14 @@ def show_redirect_page():
             if request.form['email']:
                 email = request.form['email']
                 if check_register(username, password, email):
-                    return render_user(username, '', '')
+                    token = create_token(username)
+                    return render_user(username, '', '', )
                 else:
                     return render_template('auth.html', show_register_fields=show_register_fields, show_alert=True)
             else:
                 if check_login(username, password):
-                    return render_user(username, '', '')
+                    token = create_token(username)
+                    return render_user(username, '', '', token)
                 else:
                     return render_template('auth.html', show_alert=True)
         else:
@@ -151,17 +181,15 @@ def show_redirect_page():
     return render_template('auth.html', show_register_fields=show_register_fields)
 
 
-@app.route("/user", methods=['GET'])
-def render_user(username: str = '', result_text_exists: str = '', result_image_exists: str = '', flag_exists: bool = False):
-    if username == '' or username == '' and result_text_exists == '' or username == '' and result_text_exists == '' and result_image_exists == '':
-        abort(403)
+def render_user(username: str = '', result_text_exists: str = '', result_image_exists: str = '', token: str = '',
+                flag_exists: bool = False):
 
     balance = select_users(username)[0][4]
     free_count = balance
     return render_template('user.html', username=username, balance=balance,
                            result_text_exists=result_text_exists,
                            result_image_exists=result_image_exists,
-                           free_count=free_count)
+                           free_count=free_count, token=token)
 
 
 def check_login(username: str, password: str) -> bool:

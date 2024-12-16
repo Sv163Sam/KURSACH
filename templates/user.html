@@ -36,12 +36,14 @@
         <section class="upload">
             <h2 id="upload-title">Загрузите файл</h2>
             <div class="video">
-                <form method="POST" action="/upload_a/{{ username }}" enctype="multipart/form-data" id="upload-form">
+                <form method="POST" action="/upload_a" enctype="multipart/form-data" id="upload-form">
+                    <input type="hidden" name="username" value="{{ username }}">
+                    <input type="hidden" name="token" value="{{ token }}">
                     <button type="button" onclick="document.getElementById('video-file').click()" class="upload-button">+</button>
                     <input type="file" name="file" id="video-file" style="display: none;" onchange="submitForm();">
+                    <input type="submit" value="Upload" style="display: none;">
                 </form>
             </div>
-
             <script>
                 function submitForm()
                 {
