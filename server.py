@@ -167,7 +167,7 @@ def show_redirect_page():
                 email = request.form['email']
                 if check_register(username, password, email):
                     token = create_token(username)
-                    return render_user(username, '', '', )
+                    return render_user(username, '', '', token)
                 else:
                     return render_template('auth.html', show_register_fields=show_register_fields, show_alert=True)
             else:
